@@ -1,0 +1,12 @@
+services:
+  auth-service:
+    path: ./app/auth
+
+  user-service:
+    path: ./app/user
+
+  team-service:
+    path: ./app/team
+
+  unity-service:
+    path: ./app/unity

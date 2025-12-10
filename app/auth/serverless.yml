@@ -1,0 +1,8 @@
+service: auth-service
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  signin:
+    handler: src/index.main

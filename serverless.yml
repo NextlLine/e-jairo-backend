@@ -1,0 +1,13 @@
+org: j41r0
+app: e-jairo
+service: e-jairo
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  function1:
+    handler: index.handler
+
