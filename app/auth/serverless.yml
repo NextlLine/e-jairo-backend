@@ -1,8 +1,16 @@
+org: j41r0
+app: e-jairo
 service: auth-service
+
 provider:
   name: aws
   runtime: nodejs18.x
+  esbuild: true
 
 functions:
-  signin:
-    handler: src/index.main
+  testHelloWorld:
+    handler: src/handler.testHelloWorld
+    url: true
+
+plugins:
+  - serverless-offline

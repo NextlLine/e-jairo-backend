@@ -1,5 +1,9 @@
-service: auth-service
+org: j41r0
+app: e-jairo
+service: team-service
+
 provider:
   name: aws
   runtime: nodejs18.x
+  esbuild: true
 
