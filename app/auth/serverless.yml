@@ -17,5 +17,19 @@ functions:
           path: /signup
           method: post
 
+  confirmUser:
+    handler: src/handler.confirmCode
+    events:
+      - httpApi:
+          path: /confirm
+          method: post
+    
+  signInUser:
+    handler: src/handler.signInUser
+    events:
+      - httpApi:
+          path: /signin
+          method: post
+
 plugins:
   - serverless-offline
