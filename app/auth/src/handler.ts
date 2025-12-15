@@ -32,7 +32,7 @@ export async function signUpUser(
 
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error" }),
+      body: JSON.stringify({ message: "Internal server error: " + err.message }),
     };
   }
 }

@@ -13,7 +13,6 @@ const config: CognitoIdentityProviderClientConfig = {
 const client = new CognitoIdentityProviderClient(config);
 
 const SignUpUserSchema = z.object({
-  userName: z.string().min(3).max(30),
   email: z.string().email(),
   password: z.string().min(8).max(100),
 });
@@ -27,7 +26,7 @@ export async function signUpUserService(userData: z.infer<typeof SignUpUserSchem
 
   const signUpCommand = new SignUpCommand({
     ClientId: process.env.COGNITO_CLIENT_ID!,
-    Username: validatedData.userName,
+    Username: validatedData.email,
     Password: validatedData.password,
     UserAttributes: [{ Name: "email", Value: validatedData.email },],
   });
