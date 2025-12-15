@@ -4,5 +4,10 @@
     "@types/aws-lambda": "^8.10.159",
     "@types/node": "^24.10.2",
     "serverless-offline": "^14.4.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.948.0",
+    "aws-lambda": "^1.0.7",
+    "zod": "^4.2.0"
   }
 }

@@ -6,11 +6,16 @@ provider:
   name: aws
   runtime: nodejs18.x
   esbuild: true
+  environment:
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
 
 functions:
-  testHelloWorld:
-    handler: src/handler.testHelloWorld
-    url: true
+  signUpUser:
+    handler: src/handler.signUpUser
+    events:
+      - httpApi:
+          path: /signup
+          method: post
 
 plugins:
   - serverless-offline
