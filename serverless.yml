@@ -1,0 +1,18 @@
+org: j41r0
+app: e-jairo
+service: e-jairo-service
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+
+functions:
+  ${file(./app/auth/functions.yml)}
+    # - ${file(./app/user/functions.yml)}
+    # - ${file(./app/team/functions.yml)}
+    # - ${file(./app/unity/functions.yml)}
+
+plugins:
+  - serverless-offline
