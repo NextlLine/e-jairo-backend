@@ -2,7 +2,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { confirmCodeService, signInService, signUpUserService } from "./service";
 import { ZodError } from "zod";
 
-export async function signUpUser(
+export async function signUp(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -72,7 +72,7 @@ export async function confirmCode(
   }
 }
 
-export async function signInUser(
+export async function signIn(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -84,7 +84,7 @@ export async function signInUser(
     }
 
     const body = JSON.parse(event.body!);
-    
+
     const response = await signInService(body);
 
     return {

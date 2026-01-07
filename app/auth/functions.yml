@@ -1,0 +1,20 @@
+signUp:
+  handler: app/auth/src/handler.signUp
+  events:
+    - httpApi:
+        path: /auth/signup
+        method: post
+
+confirmCode:
+  handler: app/auth/src/handler.confirmCode
+  events:
+    - httpApi:
+        path: /auth/confirmCode
+        method: post
+
+signIn:
+  handler: app/auth/src/handler.signIn
+  events:
+    - httpApi:
+        path: /auth/signin
+        method: post

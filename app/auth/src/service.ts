@@ -23,7 +23,6 @@ const ConfirmCodeSchema = z.object({
   code: z.string().length(6),
 });
 
-// AWS Cognito Client Configuration
 const config: CognitoIdentityProviderClientConfig = {
   region: process.env.AWS_REGION || "us-east-1",
 };
@@ -55,8 +54,8 @@ export async function signUpUserService(userData: z.infer<typeof SignUpUserSchem
 export async function confirmCodeService(codeData: z.infer<typeof ConfirmCodeSchema>) {
   const validatedData = ConfirmCodeSchema.parse(codeData);
 
-  if (!process.env.COGNITO_CLIENT_ID) {
-    throw new Error("COGNITO_CLIENT_ID not configured");
+  if (!process.env.COGNITO_CLIENT_ID || !process.env.COGNITO_USER_POOL_ID) {
+    throw new Error("Cognito env not configured");
   }
 
   const input = {
@@ -67,6 +66,10 @@ export async function confirmCodeService(codeData: z.infer<typeof ConfirmCodeSch
 
   const command = new ConfirmSignUpCommand(input);
   const response = await client.send(command);
+
+  if (response.Session) {
+
+  }
 
   return {
     session: response.Session,
@@ -97,4 +100,3 @@ export async function signInService(userData: z.infer<typeof SignInUserSchema>) 
     session: response.Session,
   };
 }
-
