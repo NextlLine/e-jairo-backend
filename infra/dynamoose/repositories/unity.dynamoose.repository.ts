@@ -1,14 +1,10 @@
+import { Unity } from "../../../domain/unity/unity.entity";
+import { UnityRepository } from "../../../domain/unity/unity.repository";
 import { AppTable } from "../table";
 
-export class UnityDynamooseRepository {
-  async create(unity: {
-    id: string;
-    name: string;
-    hash: string;
-    address: string;
-    phone: string;
-  }) {
-    return AppTable.create({
+export class UnityDynamooseRepository implements UnityRepository {
+  async create(unity: Unity): Promise<Unity> {
+    await AppTable.create({
       PK: `UNITY#${unity.id}`,
       SK: "PROFILE",
 
@@ -16,12 +12,26 @@ export class UnityDynamooseRepository {
 
       ...unity,
     });
+
+    return unity;
   }
 
-  async findById(unityId: string) {
-    return AppTable.get({
+  async findById(unityId: string): Promise<Unity | null> {
+    const item = await AppTable.get({
       PK: `UNITY#${unityId}`,
       SK: "PROFILE",
     });
+
+    if (!item) return null;
+
+    return new Unity(
+      item.id,
+      item.name,
+      item.hash,
+      item.address,
+      item.phone
+    );
   }
 }
+
+export const dynamooseUnityRepository = new UnityDynamooseRepository();

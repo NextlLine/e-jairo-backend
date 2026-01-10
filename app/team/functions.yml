@@ -1,0 +1,6 @@
+createTeam:
+  handler: app/team/src/handler.create
+  events:
+    - httpApi:
+        path: /team/create
+        method: post

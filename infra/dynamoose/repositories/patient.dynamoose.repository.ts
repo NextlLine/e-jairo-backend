@@ -1,16 +1,10 @@
+import { Patient } from "../../../domain/patient/patient.entity";
+import { PatientRepository } from "../../../domain/patient/patient.repository";
 import { AppTable } from "../table";
 
-export class PatientDynamooseRepository {
-  async create(patient: {
-    id: string;
-    name: string;
-    motherName: string;
-    doc: string;
-    phone: string;
-    birthDate: string;
-    teamId: string;
-  }) {
-    return AppTable.create({
+export class PatientDynamooseRepository implements PatientRepository {
+  async create(patient: Patient): Promise<Patient> {
+    await AppTable.create({
       PK: `PATIENT#${patient.id}`,
       SK: "PROFILE",
 
@@ -21,20 +15,42 @@ export class PatientDynamooseRepository {
 
       ...patient,
     });
+
+    return patient;
   }
 
-  async findById(patientId: string) {
-    const items = await AppTable.query("PK")
-      .eq(`PATIENT#${patientId}`)
-      .exec();
-
-    return items;
+  async findById(patientId: string): Promise<Patient | null> {
+    const item = await AppTable.get({
+      PK: `PATIENT#${patientId}`,
+      SK: "PROFILE"
+    });
+    return new Patient(
+      item.id,
+      item.name,
+      item.motherName,
+      item.birthDate,
+      item.teamId,
+      item.createdAt,
+      item.updatedAt
+    );
   }
 
-  async listByTeam(teamId: string) {
-    return AppTable.query("GSI1PK")
+  async listByTeam(teamId: string): Promise<Patient[]> {
+    const items = await AppTable.query("GSI1PK")
       .eq(`TEAM#${teamId}`)
       .using("GSI1")
       .exec();
+
+    return items.map((item) =>
+      new Patient(
+        item.id,
+        item.name,
+        item.motherName,
+        item.birthDate,
+        item.teamId,
+        item.createdAt,
+        item.updatedAt
+      )
+    );
   }
 }

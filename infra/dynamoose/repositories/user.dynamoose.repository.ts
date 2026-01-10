@@ -9,8 +9,8 @@ export class UserDynamooseRepository implements UserRepository {
       PK: `USER#${user.id}`,
       SK: "PROFILE",
 
-      GSI1PK: user.teamId ? `TEAM#${user.teamId}` : undefined,
-      GSI1SK: user.teamId ? `USER#${user.id}` : undefined,
+      GSI1PK: `TEAM#${user.teamId}`,
+      GSI1SK: `USER#${user.id}`,
 
       entity: "USER",
 
@@ -81,3 +81,5 @@ export class UserDynamooseRepository implements UserRepository {
     );
   }
 }
+
+export const dynamooseUserRepository = new UserDynamooseRepository();

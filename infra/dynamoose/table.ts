@@ -55,4 +55,5 @@ const AppTableSchema = new dynamoose.Schema(
 export const AppTable = dynamoose.model(TABLE_NAME, AppTableSchema, {
   create: false,
   update: false,
+  waitForActive: false,
 });

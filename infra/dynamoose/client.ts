@@ -7,3 +7,4 @@ const ddb = new dynamoose.aws.ddb.DynamoDB({
 dynamoose.aws.ddb.set(ddb);
 
 export default dynamoose;
+

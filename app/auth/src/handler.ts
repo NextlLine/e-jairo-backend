@@ -1,10 +1,12 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { confirmCodeService, signInService, signUpUserService } from "./service";
 import { ZodError } from "zod";
+import { AuthService } from "./service";
+import { dynamooseUserRepository } from "../../../infra/dynamoose/repositories/user.dynamoose.repository";
+import { dynamooseTeamRepository } from "../../../infra/dynamoose/repositories/team.dynamoose.repository";
 
-export async function signUp(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
+const authService = new AuthService(dynamooseUserRepository, dynamooseTeamRepository);
+
+export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     if (!event.body) {
       return {
@@ -14,7 +16,7 @@ export async function signUp(
     }
 
     const body = JSON.parse(event.body!);
-    const response = await signUpUserService(body);
+    const response = await authService.signUp(body);
 
     return {
       statusCode: 200,
@@ -37,9 +39,7 @@ export async function signUp(
   }
 }
 
-export async function confirmCode(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
+export async function confirmCode(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     if (!event.body) {
       return {
@@ -50,7 +50,7 @@ export async function confirmCode(
 
     const body = JSON.parse(event.body!);
 
-    const response = await confirmCodeService(body);
+    const response = await authService.confirmCode(body);
     return {
       statusCode: 200,
       body: JSON.stringify(response),
@@ -72,9 +72,7 @@ export async function confirmCode(
   }
 }
 
-export async function signIn(
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> {
+export async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     if (!event.body) {
       return {
@@ -85,7 +83,7 @@ export async function signIn(
 
     const body = JSON.parse(event.body!);
 
-    const response = await signInService(body);
+    const response = await authService.signIn(body);
 
     return {
       statusCode: 200,

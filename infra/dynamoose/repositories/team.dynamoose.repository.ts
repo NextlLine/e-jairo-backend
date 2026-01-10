@@ -1,13 +1,10 @@
+import { Team } from "../../../domain/team/team.entity";
+import { TeamRepository } from "../../../domain/team/team.repository";
 import { AppTable } from "../table";
 
-export class TeamDynamooseRepository {
-  async create(team: {
-    id: string;
-    name: string;
-    hash: string;
-    unityId: string;
-  }) {
-    return AppTable.create({
+export class TeamDynamooseRepository implements TeamRepository {
+  async create(team: Team): Promise<Team> {
+    await AppTable.create({
       PK: `TEAM#${team.id}`,
       SK: "PROFILE",
 
@@ -18,19 +15,39 @@ export class TeamDynamooseRepository {
 
       ...team,
     });
+
+    return team;
   }
 
-  async findById(teamId: string) {
-    return AppTable.get({
+  async findById(teamId: string): Promise<Team | null> {
+    const item = await AppTable.get({
       PK: `TEAM#${teamId}`,
       SK: "PROFILE",
     });
+
+    if (!item) return null;
+
+    return new Team(
+      item.id,
+      item.name,
+      item.unityId,
+      item.hash,
+    );
   }
 
-  async listByUnity(unityId: string) {
-    return AppTable.query("GSI2PK")
+  async listByUnity(unityId: string): Promise<Team[]> {
+    const items = await AppTable.query("GSI2PK")
       .eq(`UNITY#${unityId}`)
       .using("GSI2")
       .exec();
+
+    return items.map((item: any) => new Team(
+      item.id,
+      item.name,
+      item.unityId,
+      item.hash,
+    ));
   }
 }
+
+export const dynamooseTeamRepository = new TeamDynamooseRepository();
