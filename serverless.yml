@@ -1,0 +1,53 @@
+org: j41r0
+app: e-jairo
+service: e-jairo-service
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:DYNAMODB_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:DYNAMODB_TABLE_NAME}/index/*
+
+functions:
+    - ${file(./app/auth/functions.yml)}
+    # - ${file(./app/user/functions.yml)}
+    - ${file(./app/team/functions.yml)}
+    - ${file(./app/unity/functions.yml)}
+
+resources:
+  Resources:
+    AppDynamoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:DYNAMODB_TABLE_NAME}
+        BillingMode: PAY_PER_REQUEST
+
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+
+
+plugins:
+  - serverless-offline

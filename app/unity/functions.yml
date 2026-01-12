@@ -1,0 +1,6 @@
+createUnity:
+  handler: app/unity/src/handler.create
+  events:
+    - httpApi:
+        path: /unity/create
+        method: post
