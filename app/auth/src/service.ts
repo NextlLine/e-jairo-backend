@@ -1,4 +1,4 @@
-import z, { email } from "zod";
+import z from "zod";
 import {
   CognitoIdentityProviderClient,
   CognitoIdentityProviderClientConfig,
@@ -6,7 +6,6 @@ import {
   ConfirmSignUpCommand,
   InitiateAuthCommand,
   AuthFlowType,
-  DeleteUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { UserRepository } from "../../../domain/user/user.repository";
 import { TeamRepository } from "../../../domain/team/team.repository";

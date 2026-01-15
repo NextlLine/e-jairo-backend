@@ -1,4 +1,3 @@
-import { ca } from "zod/v4/locales";
 import { dynamooseUnityRepository } from "../../../infra/dynamoose/repositories/unity.dynamoose.repository";
 import { UnityService } from "./service";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
