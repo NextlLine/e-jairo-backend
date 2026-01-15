@@ -3,7 +3,7 @@ import dynamoose from "./client";
 const TABLE_NAME = process.env.DYNAMODB_TABLE_NAME;
 
 if (!TABLE_NAME) {
-  throw new Error("DYNAMODB_TABLE_NAME não definida");
+  throw new Error("DYNAMODB_TABLE_NAME not set in environment variables");
 }
 
 const AppTableSchema = new dynamoose.Schema(

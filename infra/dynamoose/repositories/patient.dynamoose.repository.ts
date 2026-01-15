@@ -24,6 +24,11 @@ export class PatientDynamooseRepository implements PatientRepository {
       PK: `PATIENT#${patientId}`,
       SK: "PROFILE"
     });
+
+    if (!item) {
+      return null;
+    }
+    
     return new Patient(
       item.id,
       item.name,

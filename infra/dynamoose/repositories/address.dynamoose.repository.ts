@@ -4,7 +4,7 @@ import { AddressEntityType } from "../../../domain/types/AddressEntityType";
 import { AppTable } from "../table";
 
 export class AddressDynamooseRepository implements AddressRepository {
-  async upsert(entityId: string, addressEntityType: AddressEntityType, address: Address): Promise<Address> {
+  async create(entityId: string, addressEntityType: AddressEntityType, address: Address): Promise<Address> {
     await AppTable.create({
       PK: `${addressEntityType}#${entityId}`,
       SK: "ADDRESS",
