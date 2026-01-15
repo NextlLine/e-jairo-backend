@@ -24,10 +24,8 @@ export class AddressDynamooseRepository implements AddressRepository {
       SK: "ADDRESS",
     });
 
-    if (!item) {
-      return null;
-    }
-
+    if (!item) return null;
+    
     return new Address(
       item.street,
       item.city,

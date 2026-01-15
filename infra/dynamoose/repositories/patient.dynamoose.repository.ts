@@ -25,9 +25,8 @@ export class PatientDynamooseRepository implements PatientRepository {
       SK: "PROFILE"
     });
 
-    if (!item) {
-      return null;
-    }
+    if (!item) return null;
+    
     
     return new Patient(
       item.id,
