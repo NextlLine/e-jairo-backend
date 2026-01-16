@@ -7,6 +7,12 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
+
+  environment:
+    DYNAMODB_TABLE_NAME: ${env:DYNAMODB_TABLE_NAME}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    
   iam:
     role:
       statements:
@@ -46,7 +52,6 @@ resources:
             KeyType: HASH
           - AttributeName: SK
             KeyType: RANGE
-
 
 plugins:
   - serverless-offline
