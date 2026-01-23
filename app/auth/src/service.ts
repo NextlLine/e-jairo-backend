@@ -16,7 +16,6 @@ const SignUpUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(100),
   name: z.string(),
-  role: z.enum(Object.values(UserRoles) as [UserRoles, ...UserRoles[]]),
   teamId: z.string(),
 });
 
@@ -68,7 +67,7 @@ export class AuthService {
         response.UserSub,
         validatedData.email,
         validatedData.name,
-        validatedData.role,
+        UserRoles.USER,
         validatedData.teamId,
       )
     );
@@ -108,21 +107,44 @@ export class AuthService {
       throw new Error("COGNITO_CLIENT_ID not configured");
     }
 
-    const input = {
-      AuthFlow: AuthFlowType.USER_AUTH,
-      AuthParameters: {
-        "USERNAME": validatedData.email,
-        "PASSWORD": validatedData.password,
-      },
-      ClientId: process.env.COGNITO_CLIENT_ID!,
-    };
+    try {
+      const input = {
+        AuthFlow: AuthFlowType.USER_AUTH,
+        AuthParameters: {
+          USERNAME: validatedData.email,
+          PASSWORD: validatedData.password,
+        },
+        ClientId: process.env.COGNITO_CLIENT_ID!,
+      };
 
-    const command = new InitiateAuthCommand(input);
-    const response = await client.send(command);
+      const command = new InitiateAuthCommand(input);
+      const response = await client.send(command);
 
-    return {
-      authenticationResult: response.AuthenticationResult,
-      session: response.Session,
-    };
+      if (!response.AuthenticationResult) {
+        throw new Error("Invalid credentials");
+      }
+
+      return {
+        authenticationResult: response.AuthenticationResult,
+        session: response.Session,
+      };
+
+    } catch (err: any) {
+
+      if (err.name === "NotAuthorizedException") {
+        throw new Error("Email ou senha inválidos");
+      }
+
+      if (err.name === "UserNotConfirmedException") {
+        throw new Error("Usuário ainda não confirmado");
+      }
+
+      if (err.name === "UserNotFoundException") {
+        throw new Error("Usuário não encontrado");
+      }
+
+      throw new Error("Erro ao realizar login");
+    }
   }
+
 }

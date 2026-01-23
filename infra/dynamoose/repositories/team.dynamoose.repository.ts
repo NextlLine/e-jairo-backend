@@ -30,7 +30,6 @@ export class TeamDynamooseRepository implements TeamRepository {
     return new Team(
       item.id,
       item.name,
-      item.hash,
       item.unityId,
     );
   }
@@ -45,7 +44,6 @@ export class TeamDynamooseRepository implements TeamRepository {
       item.id,
       item.name,
       item.unityId,
-      item.hash,
     ));
   }
 }

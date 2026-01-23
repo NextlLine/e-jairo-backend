@@ -27,7 +27,6 @@ export class UnityDynamooseRepository implements UnityRepository {
     return new Unity(
       item.id,
       item.name,
-      item.hash,
       item.phone,
     );
   }

@@ -8,11 +8,33 @@ provider:
   runtime: nodejs20.x
   region: us-east-1
 
+  httpApi:
+    cors:
+      allowedOrigins:
+        - ${env:CORS_ALLOWED_ORIGIN}
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      allowCredentials: true
+      maxAge: 6000
+
+    authorizers:
+      jwtAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${env:COGNITO_USER_POOL_ID}
+        audience:
+          - ${env:COGNITO_CLIENT_ID}
+
   environment:
     DYNAMODB_TABLE_NAME: ${env:DYNAMODB_TABLE_NAME}
     COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
-    
+
   iam:
     role:
       statements:
@@ -28,10 +50,9 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:DYNAMODB_TABLE_NAME}/index/*
 
 functions:
-    - ${file(./app/auth/functions.yml)}
-    # - ${file(./app/user/functions.yml)}
-    - ${file(./app/team/functions.yml)}
-    - ${file(./app/unity/functions.yml)}
+  - ${file(./app/auth/functions.yml)}
+  - ${file(./app/team/functions.yml)}
+  - ${file(./app/unity/functions.yml)}
 
 resources:
   Resources:

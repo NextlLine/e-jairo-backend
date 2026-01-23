@@ -6,7 +6,6 @@ import { randomUUID } from "crypto";
 
 const CreateTeamSchema = z.object({
   name: z.string().min(3).max(50),
-  hash: z.string().min(10).max(100),
   unityId: z.string().uuid(),
 });
 
@@ -24,7 +23,6 @@ export class TeamService {
     const team = new Team(
       randomUUID(),
       validatedData.name,
-      validatedData.hash,
       validatedData.unityId,
     );
 

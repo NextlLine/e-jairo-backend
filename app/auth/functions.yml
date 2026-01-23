@@ -9,7 +9,7 @@ confirmCode:
   handler: app/auth/src/handler.confirmCode
   events:
     - httpApi:
-        path: /auth/confirmCode
+        path: /auth/confirm-code
         method: post
 
 signIn:

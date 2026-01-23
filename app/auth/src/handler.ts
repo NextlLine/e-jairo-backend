@@ -72,7 +72,9 @@ export async function confirmCode(event: APIGatewayProxyEvent): Promise<APIGatew
   }
 }
 
-export async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function signIn(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
   try {
     if (!event.body) {
       return {
@@ -81,27 +83,49 @@ export async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       };
     }
 
-    const body = JSON.parse(event.body!);
-
+    const body = JSON.parse(event.body);
     const response = await authService.signIn(body);
 
     return {
       statusCode: 200,
       body: JSON.stringify(response),
     };
+
   } catch (err: any) {
-    console.error("Error in signInUser handler:", err);
+    console.error("Error in signIn handler:", err);
 
     if (err instanceof ZodError) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "Invalid input", errors: err.issues }),
+        body: JSON.stringify({
+          message: "Invalid input",
+          errors: err.issues,
+        }),
+      };
+    }
+
+    if (
+      err.message === "Email ou senha inválidos" ||
+      err.message === "Usuário não encontrado"
+    ) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: err.message }),
+      };
+    }
+
+    if (err.message === "Usuário ainda não confirmado") {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ message: err.message }),
       };
     }
 
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error: " + err.message }),
+      body: JSON.stringify({
+        message: "Internal server error",
+      }),
     };
   }
 }

@@ -5,7 +5,6 @@ import { randomUUID } from "crypto";
 
 const CreateUnitySchema = z.object({
     name: z.string().min(3).max(50),
-    hash: z.string().min(10).max(100),
     phone: z.string().min(10).max(15).nullable().optional(),
 });
 
@@ -18,7 +17,6 @@ export class UnityService {
         const newUnity = new Unity(
             randomUUID(),
             validatedData.name,
-            validatedData.hash,
             validatedData.phone ?? null,
         );
 
