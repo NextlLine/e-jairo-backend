@@ -1,9 +1,10 @@
 import { dynamooseUnityRepository } from "../../../infra/dynamoose/repositories/unity.dynamoose.repository";
+import { dynamooseAddressRepository } from "../../../infra/dynamoose/repositories/address.dynamoose.repository";
+import { formatHttpErrorResponse } from "../../../shared/errors/format-http-error-response";
 import { UnityService } from "./service";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { ZodError } from "zod";
 
-const unityService = new UnityService(dynamooseUnityRepository);
+const unityService = new UnityService(dynamooseUnityRepository, dynamooseAddressRepository);
 
 export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
     try {
@@ -21,18 +22,6 @@ export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         };
 
     } catch (err: any) {
-        console.error("Error in createUnity handler:", err);
-
-        if (err instanceof ZodError) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid input", errors: err.issues }),
-            };
-        }
-
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Internal server error: " + err.message }),
-        };
+        return formatHttpErrorResponse(err, "Erro ao criar unidade");
     }
 }

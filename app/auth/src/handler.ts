@@ -3,16 +3,15 @@ import { ZodError } from "zod";
 import { AuthService } from "./service";
 import { dynamooseUserRepository } from "../../../infra/dynamoose/repositories/user.dynamoose.repository";
 import { dynamooseTeamRepository } from "../../../infra/dynamoose/repositories/team.dynamoose.repository";
+import { HttpError } from "../../../shared/errors/http-error";
+import { formatHttpErrorResponse } from "../../../shared/errors/format-http-error-response";
 
 const authService = new AuthService(dynamooseUserRepository, dynamooseTeamRepository);
 
 export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Must pass a user" }),
-      };
+   if (!event.body) {
+      throw new HttpError(400, "Usuário nao fornecido");
     }
 
     const body = JSON.parse(event.body!);
@@ -22,30 +21,15 @@ export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       statusCode: 200,
       body: JSON.stringify(response),
     };
-  } catch (err: any) {
-    console.error("Error in signUpUser handler:", err);
-
-    if (err instanceof ZodError) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid input", errors: err.issues }),
-      };
-    }
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error: " + err.message }),
-    };
+  } catch (err) {
+    return formatHttpErrorResponse(err, "Erro ao realizar cadastro");
   }
 }
 
 export async function confirmCode(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Must pass a user" }),
-      };
+   if (!event.body) {
+      throw new HttpError(400, "Usuário nao fornecido");
     }
 
     const body = JSON.parse(event.body!);
@@ -55,53 +39,28 @@ export async function confirmCode(event: APIGatewayProxyEvent): Promise<APIGatew
       statusCode: 200,
       body: JSON.stringify(response),
     };
-  } catch (err: any) {
-    console.error("Error in confirmCode handler:", err);
-
-    if (err instanceof ZodError) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid input", errors: err.issues }),
-      };
-    }
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error: " + err.message }),
-    };
+  } catch (err) {
+    return formatHttpErrorResponse(err, "Erro ao realizar cadastro");
   }
 }
 
-export async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function signIn(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
   try {
     if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Must pass a user" }),
-      };
+      throw new HttpError(400, "Usuário nao fornecido");
     }
 
-    const body = JSON.parse(event.body!);
-
+    const body = JSON.parse(event.body);
     const response = await authService.signIn(body);
 
     return {
       statusCode: 200,
       body: JSON.stringify(response),
     };
-  } catch (err: any) {
-    console.error("Error in signInUser handler:", err);
 
-    if (err instanceof ZodError) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid input", errors: err.issues }),
-      };
-    }
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error: " + err.message }),
-    };
+  } catch (err) {
+    return formatHttpErrorResponse(err, "Erro ao realizar login");
   }
 }

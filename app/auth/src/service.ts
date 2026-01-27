@@ -11,12 +11,13 @@ import { UserRepository } from "../../../domain/user/user.repository";
 import { TeamRepository } from "../../../domain/team/team.repository";
 import { User } from "../../../domain/user/user.entity";
 import { UserRoles } from "../../../domain/types/UserRoles";
+import { HttpError } from "../../../shared/errors/http-error";
+import { mapToHttpError } from "../../../shared/errors/map-http-error";
 
 const SignUpUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(100),
   name: z.string(),
-  role: z.enum(Object.values(UserRoles) as [UserRoles, ...UserRoles[]]),
   teamId: z.string(),
 });
 
@@ -43,48 +44,53 @@ export class AuthService {
     const team = await this.teamRepository.findById(validatedData.teamId);
 
     if (!team) {
-      throw new Error("Team not found");
+      throw new HttpError(404, "Time não encontrado");
     }
 
     if (!process.env.COGNITO_CLIENT_ID) {
-      throw new Error("COGNITO_CLIENT_ID not configured");
+      throw new HttpError(500, "COGNITO_CLIENT_ID não configurado");
     }
 
-    const input = new SignUpCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID!,
-      Username: validatedData.email,
-      Password: validatedData.password,
-      UserAttributes: [{ Name: "email", Value: validatedData.email },],
-    });
+    try {
+      const input = new SignUpCommand({
+        ClientId: process.env.COGNITO_CLIENT_ID!,
+        Username: validatedData.email,
+        Password: validatedData.password,
+        UserAttributes: [{ Name: "email", Value: validatedData.email },],
+      });
 
-    const response = await client.send(input);
+      const response = await client.send(input);
 
-    if (!response.UserSub || response.UserConfirmed === undefined) {
-      throw new Error("Failed to sign up user");
+      if (!response.UserSub || response.UserConfirmed === undefined) {
+        throw new HttpError(500, "Falha ao registrar usuário");
+      }
+
+      await this.userRepository.create(
+        new User(
+          response.UserSub,
+          validatedData.email,
+          validatedData.name,
+          UserRoles.USER,
+          validatedData.teamId,
+        )
+      );
+
+      return {
+        userSub: response.UserSub,
+        userConfirmed: response.UserConfirmed,
+        session: response.Session,
+      };
+
+    } catch (err: any) {
+      mapToHttpError(err, "registrar usuário");
     }
-
-    await this.userRepository.create(
-      new User(
-        response.UserSub,
-        validatedData.email,
-        validatedData.name,
-        validatedData.role,
-        validatedData.teamId,
-      )
-    );
-
-    return {
-      userSub: response.UserSub,
-      userConfirmed: response.UserConfirmed,
-      session: response.Session,
-    };
   }
 
   async confirmCode(codeData: z.infer<typeof ConfirmCodeSchema>) {
     const validatedData = ConfirmCodeSchema.parse(codeData);
 
     if (!process.env.COGNITO_CLIENT_ID || !process.env.COGNITO_USER_POOL_ID) {
-      throw new Error("Cognito env not configured");
+      throw new HttpError(500, "Cognito env not configured");
     }
 
     const input = {
@@ -93,36 +99,49 @@ export class AuthService {
       ConfirmationCode: validatedData.code,
     };
 
-    const command = new ConfirmSignUpCommand(input);
-    const response = await client.send(command);
+    try {
+      const command = new ConfirmSignUpCommand(input);
+      const response = await client.send(command);
 
-    return {
+      return {
       session: response.Session,
     };
+    } catch (err: any) {
+      mapToHttpError(err, "confirmar código de verificação");
+    } 
   }
 
   async signIn(userData: z.infer<typeof SignInUserSchema>) {
     const validatedData = SignInUserSchema.parse(userData);
 
     if (!process.env.COGNITO_CLIENT_ID) {
-      throw new Error("COGNITO_CLIENT_ID not configured");
+      throw new HttpError(500, "COGNITO_CLIENT_ID não configurado");
     }
 
     const input = {
       AuthFlow: AuthFlowType.USER_AUTH,
       AuthParameters: {
-        "USERNAME": validatedData.email,
-        "PASSWORD": validatedData.password,
+        USERNAME: validatedData.email,
+        PASSWORD: validatedData.password,
       },
       ClientId: process.env.COGNITO_CLIENT_ID!,
     };
 
-    const command = new InitiateAuthCommand(input);
-    const response = await client.send(command);
+    try {
+      const command = new InitiateAuthCommand(input);
+      const response = await client.send(command);
 
-    return {
-      authenticationResult: response.AuthenticationResult,
-      session: response.Session,
-    };
+      if (!response.AuthenticationResult) {
+        throw new HttpError(401, "Invalid credentials");
+      }
+
+      return {
+        authenticationResult: response.AuthenticationResult,
+        session: response.Session,
+      };
+
+    } catch (err: any) {
+      mapToHttpError(err, "login");
+    }
   }
 }

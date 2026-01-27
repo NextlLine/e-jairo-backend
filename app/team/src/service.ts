@@ -1,12 +1,13 @@
-import z from "zod";
+import z, { map } from "zod";
 import { TeamRepository } from "../../../domain/team/team.repository";
 import { UnityRepository } from "../../../domain/unity/unity.repository";
 import { Team } from "../../../domain/team/team.entity";
 import { randomUUID } from "crypto";
+import { HttpError } from "../../../shared/errors/http-error";
+import { mapToHttpError } from "../../../shared/errors/map-http-error";
 
 const CreateTeamSchema = z.object({
   name: z.string().min(3).max(50),
-  hash: z.string().min(10).max(100),
   unityId: z.string().uuid(),
 });
 
@@ -18,18 +19,21 @@ export class TeamService {
 
     const existingUnity = await this.unityRepository.findById(validatedData.unityId);
     if (!existingUnity) {
-      throw new Error("Unity not found");
-    }  
-    
+      throw new HttpError(404, "Unidade não encontrada");
+    }
+
     const team = new Team(
       randomUUID(),
       validatedData.name,
-      validatedData.hash,
       validatedData.unityId,
     );
 
-    await this.teamRepository.create(team);
+    try {
+      await this.teamRepository.create(team);
+      return team;
 
-    return team;
+    } catch (error) {
+      mapToHttpError(error, "criar time");
+    }
   }
 }

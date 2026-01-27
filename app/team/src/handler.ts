@@ -3,16 +3,15 @@ import { ZodError } from "zod";
 import { TeamService } from "./service";
 import { dynamooseTeamRepository } from "../../../infra/dynamoose/repositories/team.dynamoose.repository";
 import { dynamooseUnityRepository } from "../../../infra/dynamoose/repositories/unity.dynamoose.repository";
+import { formatHttpErrorResponse } from "../../../shared/errors/format-http-error-response";
+import { HttpError } from "../../../shared/errors/http-error";
 
 const teamService = new TeamService(dynamooseTeamRepository, dynamooseUnityRepository);
 
 export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
     try {
         if (!event.body) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Must pass team data" }),
-            };
+            throw new HttpError(400, "Time nao fornecido");
         }
 
         const body = JSON.parse(event.body!);
@@ -23,19 +22,7 @@ export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             body: JSON.stringify({ message: "Team created successfully" , data: response }),
         };
     } catch (err: any) {
-        console.error("Error in createTeam handler:", err);
-
-        if (err instanceof ZodError) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid input", errors: err.issues }),
-            };
-        }
-
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Internal server error: " + err.message }),
-        };
+        return formatHttpErrorResponse(err, "Erro ao criar time");
     } 
 }
 
