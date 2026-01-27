@@ -1,5 +1,4 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { ZodError } from "zod";
 import { AuthService } from "./service";
 import { dynamooseUserRepository } from "../../../infra/dynamoose/repositories/user.dynamoose.repository";
 import { dynamooseTeamRepository } from "../../../infra/dynamoose/repositories/team.dynamoose.repository";

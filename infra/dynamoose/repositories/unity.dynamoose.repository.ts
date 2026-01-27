@@ -6,7 +6,7 @@ import { AppTable } from "../table";
 function normalizeName(name: string) {
   return name.trim().toLowerCase();
 }
-export class UnityDynamooseRepository implements UnityRepository { 
+export class UnityDynamooseRepository implements UnityRepository {
 
   async create(unity: Unity): Promise<Unity> {
     const normalized = normalizeName(unity.name);
@@ -54,16 +54,16 @@ export class UnityDynamooseRepository implements UnityRepository {
   }
 
   async findByName(name: string): Promise<Unity | null> {
-    const item = await AppTable.get
+    const indexItem = await AppTable.get({
+      PK: "UNITY_BY_NAME",
+      SK: `NAME#${normalizeName(name)}`,
+    });
 
-    if (!item) return null;
+    if (!indexItem) return null;
 
-    return new Unity(
-      item[0].id,
-      item[0].name,
-      item[0].phone,
-    );
+    return this.findById(indexItem.unityId);
   }
+
 }
 
 export const dynamooseUnityRepository = new UnityDynamooseRepository();

@@ -5,6 +5,9 @@ import { randomUUID } from "crypto";
 import { mapToHttpError } from "../../../shared/errors/map-http-error";
 import { HttpError } from "../../../shared/errors/http-error";
 import { AddressRepository } from "../../../domain/address/address.repository";
+import { UserRepository } from "../../../domain/user/user.repository";
+import { verifyUserRole } from "../../../infra/dynamoose/shared/verify-user-permission";
+import { UserRoles } from "../../../domain/types/UserRoles";
 
 const CreateUnitySchema = z.object({
     name: z.string().min(3).max(50),
@@ -19,9 +22,14 @@ const CreateUnitySchema = z.object({
 });
 
 export class UnityService {
-    constructor(private readonly unityRepository: UnityRepository, private readonly addressRepository: AddressRepository) { }
+    constructor(
+        private readonly unityRepository: UnityRepository,
+        private readonly addressRepository: AddressRepository,
+        private readonly userRepository: UserRepository
+    ) { }
 
-    async createUnity(data: z.infer<typeof CreateUnitySchema>) {
+    async createUnity(data: z.infer<typeof CreateUnitySchema>, userSub: string) {
+        await verifyUserRole(userSub, [UserRoles.MASTER], this.userRepository);
 
         const validatedData = CreateUnitySchema.parse(data);
 
@@ -39,13 +47,13 @@ export class UnityService {
                 unity,
                 address: address,
             }
-            
-        } catch (error) {
-            if (error.name === "TransactionCanceledException") {
+
+        } catch (error: unknown) {
+            if (error instanceof Error && error.name === "TransactionCanceledException") {
                 throw new HttpError(409, "Unidade com este nome já existe");
             }
-            
-            mapToHttpError(error, "criar unidade");
+
+            return mapToHttpError(error, "criar unidade");
         }
     }
 }

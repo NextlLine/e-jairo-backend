@@ -82,7 +82,7 @@ export class AuthService {
       };
 
     } catch (err: any) {
-      mapToHttpError(err, "registrar usuário");
+      return mapToHttpError(err, "registrar usuário");
     }
   }
 
@@ -104,11 +104,11 @@ export class AuthService {
       const response = await client.send(command);
 
       return {
-      session: response.Session,
-    };
+        session: response.Session,
+      };
     } catch (err: any) {
-      mapToHttpError(err, "confirmar código de verificação");
-    } 
+      return mapToHttpError(err, "confirmar código de verificação");
+    }
   }
 
   async signIn(userData: z.infer<typeof SignInUserSchema>) {
@@ -119,7 +119,7 @@ export class AuthService {
     }
 
     const input = {
-      AuthFlow: AuthFlowType.USER_AUTH,
+      AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
       AuthParameters: {
         USERNAME: validatedData.email,
         PASSWORD: validatedData.password,
@@ -127,13 +127,10 @@ export class AuthService {
       ClientId: process.env.COGNITO_CLIENT_ID!,
     };
 
-    try {
-      const command = new InitiateAuthCommand(input);
-      const response = await client.send(command);
+    const command = new InitiateAuthCommand(input);
 
-      if (!response.AuthenticationResult) {
-        throw new HttpError(401, "Invalid credentials");
-      }
+    try {
+      const response = await client.send(command);
 
       return {
         authenticationResult: response.AuthenticationResult,
@@ -141,7 +138,7 @@ export class AuthService {
       };
 
     } catch (err: any) {
-      mapToHttpError(err, "login");
+      return mapToHttpError(err, "login");
     }
   }
 }

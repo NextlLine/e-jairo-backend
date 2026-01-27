@@ -1,10 +1,13 @@
-import z, { map } from "zod";
+import z from "zod";
 import { TeamRepository } from "../../../domain/team/team.repository";
 import { UnityRepository } from "../../../domain/unity/unity.repository";
 import { Team } from "../../../domain/team/team.entity";
 import { randomUUID } from "crypto";
 import { HttpError } from "../../../shared/errors/http-error";
 import { mapToHttpError } from "../../../shared/errors/map-http-error";
+import { UserRoles } from "../../../domain/types/UserRoles";
+import { verifyUserRole } from "../../../infra/dynamoose/shared/verify-user-permission";
+import { UserRepository } from "../../../domain/user/user.repository";
 
 const CreateTeamSchema = z.object({
   name: z.string().min(3).max(50),
@@ -12,9 +15,15 @@ const CreateTeamSchema = z.object({
 });
 
 export class TeamService {
-  constructor(private readonly teamRepository: TeamRepository, private readonly unityRepository: UnityRepository) { }
+  constructor(
+    private readonly teamRepository: TeamRepository, 
+    private readonly unityRepository: UnityRepository, 
+    private readonly userRepository: UserRepository
+  ) { }
 
-  async createTeam(teamData: z.infer<typeof CreateTeamSchema>) {
+  async createTeam(teamData: z.infer<typeof CreateTeamSchema>, userSub: string) {
+    await verifyUserRole(userSub, [UserRoles.ADMIN], this.userRepository);
+    
     const validatedData = CreateTeamSchema.parse(teamData);
 
     const existingUnity = await this.unityRepository.findById(validatedData.unityId);
@@ -33,7 +42,7 @@ export class TeamService {
       return team;
 
     } catch (error) {
-      mapToHttpError(error, "criar time");
+      return mapToHttpError(error, "criar time");
     }
   }
 }
