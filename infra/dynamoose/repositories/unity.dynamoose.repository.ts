@@ -1,17 +1,39 @@
 import { Unity } from "../../../domain/unity/unity.entity";
 import { UnityRepository } from "../../../domain/unity/unity.repository";
+import dynamoose from "../client";
 import { AppTable } from "../table";
 
-export class UnityDynamooseRepository implements UnityRepository {
+function normalizeName(name: string) {
+  return name.trim().toLowerCase();
+}
+export class UnityDynamooseRepository implements UnityRepository { 
+
   async create(unity: Unity): Promise<Unity> {
-    await AppTable.create({
+    const normalized = normalizeName(unity.name);
+
+    const nameIndexItem = {
+      PK: "UNITY_BY_NAME",
+      SK: `NAME#${normalized}`,
+      unityId: unity.id,
+      entity: "UNITY_NAME_INDEX",
+    };
+
+    const unityItem = {
       PK: `UNITY#${unity.id}`,
       SK: "PROFILE",
-
       entity: "UNITY",
-
       ...unity,
-    });
+    };
+
+    const condition = new dynamoose.Condition()
+      .where("PK").not().exists()
+      .and()
+      .where("SK").not().exists();
+
+    await dynamoose.transaction([
+      AppTable.transaction.create(nameIndexItem, { condition }),
+      AppTable.transaction.create(unityItem),
+    ]);
 
     return unity;
   }
@@ -28,6 +50,18 @@ export class UnityDynamooseRepository implements UnityRepository {
       item.id,
       item.name,
       item.phone,
+    );
+  }
+
+  async findByName(name: string): Promise<Unity | null> {
+    const item = await AppTable.get
+
+    if (!item) return null;
+
+    return new Unity(
+      item[0].id,
+      item[0].name,
+      item[0].phone,
     );
   }
 }

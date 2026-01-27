@@ -35,3 +35,5 @@ export class AddressDynamooseRepository implements AddressRepository {
     );
   }
 }
+
+export const dynamooseAddressRepository = new AddressDynamooseRepository();
