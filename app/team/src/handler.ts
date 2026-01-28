@@ -4,26 +4,30 @@ import { dynamooseTeamRepository } from "../../../infra/dynamoose/repositories/t
 import { dynamooseUnityRepository } from "../../../infra/dynamoose/repositories/unity.dynamoose.repository";
 import { HttpError } from "../../../shared/errors/http-error";
 import { dynamooseUserRepository } from "../../../infra/dynamoose/repositories/user.dynamoose.repository";
+import { formatHttpErrorResponse } from "../../../shared/errors/format-http-error-response";
 
 const teamService = new TeamService(dynamooseTeamRepository, dynamooseUnityRepository, dynamooseUserRepository);
 
 export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-    if (!event.body) {
-        throw new HttpError(400, "Time nao fornecido");
+    try {
+        if (!event.body) {
+            throw new HttpError(400, "Time nao fornecido");
+        }
+
+        if (!event.requestContext.authorizer) {
+            throw new HttpError(401, "Não autorizado");
+        }
+
+        const body = JSON.parse(event.body!);
+        const userSub = event.requestContext.authorizer.jwt.claims.sub;
+
+        const response = await teamService.createTeam(body, userSub);
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Team created successfully", data: response }),
+        };
+    } catch (err: any) {
+        return formatHttpErrorResponse(err, "Erro ao criar time");
     }
-
-    if (!event.requestContext.authorizer){
-        throw new HttpError(401, "Não autorizado");
-    }
-
-     const body = JSON.parse(event.body!);
-    const userSub = event.requestContext.authorizer.jwt.claims.sub;
-
-    const response = await teamService.createTeam(body, userSub);
-
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Team created successfully", data: response }),
-    };
 }
-
