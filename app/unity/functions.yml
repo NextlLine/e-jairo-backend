@@ -4,3 +4,5 @@ createUnity:
     - httpApi:
         path: /unity/create
         method: post
+        authorizer:
+          name: jwtAuthorizer

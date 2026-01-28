@@ -4,3 +4,5 @@ createTeam:
     - httpApi:
         path: /team/create
         method: post
+        authorizer:
+          name: jwtAuthorizer
