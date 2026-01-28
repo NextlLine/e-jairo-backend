@@ -75,12 +75,6 @@ export class AuthService {
         )
       );
 
-      return {
-        userSub: response.UserSub,
-        userConfirmed: response.UserConfirmed,
-        session: response.Session,
-      };
-
     } catch (err: any) {
       return mapToHttpError(err, "registrar usuário");
     }
