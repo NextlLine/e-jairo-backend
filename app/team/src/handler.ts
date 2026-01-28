@@ -25,7 +25,7 @@ export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Team created successfully", data: response }),
+            body: JSON.stringify({ message: "Time Criado com sucesso", data: response }),
         };
     } catch (err: any) {
         return formatHttpErrorResponse(err, "Erro ao criar time");

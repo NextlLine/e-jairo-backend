@@ -5,16 +5,14 @@ import { UnityService } from "./service";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { dynamooseUserRepository } from "../../../infra/dynamoose/repositories/user.dynamoose.repository";
 import { HttpError } from "../../../shared/errors/http-error";
+import { th } from "zod/v4/locales";
 
 const unityService = new UnityService(dynamooseUnityRepository, dynamooseAddressRepository, dynamooseUserRepository);
 
 export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
     try {
         if (!event.body) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Must pass unity data" }),
-            };
+            throw new HttpError(400, "Unidade nao fornecida");
         }
 
         if (!event.requestContext.authorizer){
@@ -27,7 +25,7 @@ export async function create(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         const response = await unityService.createUnity(body, userSub);
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Unity created successfully", data: response }),
+            body: JSON.stringify({ message: "Unidade criada com sucesso", data: response }),
         };
 
     } catch (err: any) {
