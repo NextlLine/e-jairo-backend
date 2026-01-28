@@ -14,11 +14,11 @@ export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     }
 
     const body = JSON.parse(event.body!);
-    const response = await authService.signUp(body);
+    await authService.signUp(body);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(response),
+      body: JSON.stringify({ message: "Usuário cadastrado com sucesso"}),
     };
   } catch (err) {
     return formatHttpErrorResponse(err, "Erro ao realizar cadastro");
