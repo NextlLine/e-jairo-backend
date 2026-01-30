@@ -9,7 +9,7 @@ const authService = new AuthService(dynamooseUserRepository, dynamooseTeamReposi
 
 export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-   if (!event.body) {
+    if (!event.body) {
       throw new HttpError(400, "Usuário nao fornecido");
     }
 
@@ -18,7 +18,7 @@ export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Usuário cadastrado com sucesso"}),
+      body: JSON.stringify({ message: "Usuário cadastrado com sucesso" }),
     };
   } catch (err) {
     return formatHttpErrorResponse(err, "Erro ao realizar cadastro");
@@ -27,7 +27,7 @@ export async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
 export async function confirmCode(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-   if (!event.body) {
+    if (!event.body) {
       throw new HttpError(400, "Usuário nao fornecido");
     }
 
@@ -54,8 +54,13 @@ export async function signIn(
     const body = JSON.parse(event.body);
     const response = await authService.signIn(body);
 
+    console.log("response", JSON.stringify(response));
+
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(response),
     };
 
