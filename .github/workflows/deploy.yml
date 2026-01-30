@@ -1,4 +1,4 @@
-name: Deploy Backend to AWS
+name: Deploy Full Stack to AWS
 
 on:
   push:
@@ -8,14 +8,14 @@ env:
   AWS_REGION: us-east-1
 
 jobs:
-  deploy-backend:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -25,10 +25,7 @@ jobs:
         run: npm ci
 
       - name: Install Serverless CLI
-        run: npm install -g "serverless@^4.31.2"
-
-      - name: Serverless Login
-        run: npx serverless login --key ${{ secrets.SLS_ACCESS_KEY }}
+        run: npm install -g serverless
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -38,10 +35,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy Backend
-        run: sls deploy --stage prod
         env:
+          SLS_ACCESS_KEY: ${{ secrets.SLS_ACCESS_KEY }}
           COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
           COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
           DYNAMODB_TABLE_NAME: ${{ secrets.DYNAMODB_TABLE_NAME }}
           AWS_CORS_ALLOWED_ORIGIN: ${{ secrets.AWS_CORS_ALLOWED_ORIGIN }}
           LOCAL_CORS_ALLOWED_ORIGIN: http://localhost:5173
+        run: sls deploy
