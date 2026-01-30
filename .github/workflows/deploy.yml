@@ -22,7 +22,6 @@ jobs:
           cache: "npm"
 
       - name: Install Backend dependencies
-        working-directory: backend
         run: npm ci
 
       - name: Configure AWS Credentials
@@ -33,7 +32,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy Backend
-        working-directory: backend
         run: sls deploy --stage prod
         env:
           COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
