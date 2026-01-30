@@ -34,12 +34,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Set Serverless License Key
-        run: echo "SLS_LICENSE_KEY=${{ secrets.SLS_LICENSE_KEY }}"
-
       - name: Deploy Backend
         run: sls deploy
         env:
+          SLS_LICENSE_KEY: ${{ secrets.SLS_LICENSE_KEY }}
           COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
           COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
           DYNAMODB_TABLE_NAME: ${{ secrets.DYNAMODB_TABLE_NAME }}
