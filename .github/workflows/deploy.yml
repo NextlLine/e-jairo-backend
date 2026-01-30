@@ -21,7 +21,8 @@ jobs:
           node-version: 20
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install Backend dependencies
+        working-directory: backend
         run: npm ci
 
       - name: Configure AWS Credentials
@@ -34,3 +35,9 @@ jobs:
       - name: Deploy Backend
         working-directory: backend
         run: sls deploy --stage prod
+        env:
+          COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+          COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
+          DYNAMODB_TABLE_NAME: ${{ secrets.DYNAMODB_TABLE_NAME }}
+          AWS_CORS_ALLOWED_ORIGIN: ${{ secrets.AWS_CORS_ALLOWED_ORIGIN }}
+          LOCAL_CORS_ALLOWED_ORIGIN: http://localhost:5173
