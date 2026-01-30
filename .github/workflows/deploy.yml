@@ -41,5 +41,4 @@ jobs:
           COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
           DYNAMODB_TABLE_NAME: ${{ secrets.DYNAMODB_TABLE_NAME }}
           AWS_CORS_ALLOWED_ORIGIN: ${{ secrets.AWS_CORS_ALLOWED_ORIGIN }}
-          LOCAL_CORS_ALLOWED_ORIGIN: http://localhost:5173
         run: sls deploy

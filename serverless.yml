@@ -12,7 +12,6 @@ provider:
     cors:
       allowedOrigins:
         - ${env:AWS_CORS_ALLOWED_ORIGIN}
-        - ${env:LOCAL_CORS_ALLOWED_ORIGIN}
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -36,7 +35,6 @@ provider:
     COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
     AWS_CORS_ALLOWED_ORIGIN: ${env:AWS_CORS_ALLOWED_ORIGIN}
-    LOCAL_CORS_ALLOWED_ORIGIN: ${env:LOCAL_CORS_ALLOWED_ORIGIN}
 
   iam:
     role:
