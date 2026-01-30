@@ -34,8 +34,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login Serverless
-        run: serverless config credentials --key ${{ secrets.SLS_LICENSE_KEY }}
+      - name: Set Serverless License Key
+        run: echo "SLS_LICENSE_KEY=${{ secrets.SLS_LICENSE_KEY }}"
 
       - name: Deploy Backend
         run: sls deploy
