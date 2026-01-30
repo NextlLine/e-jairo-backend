@@ -11,7 +11,7 @@ provider:
   httpApi:
     cors:
       allowedOrigins:
-        - ${env:AWS_CORS_ALLOWED_ORIGN}
+        - ${env:AWS_CORS_ALLOWED_ORIGIN}
         - ${env:LOCAL_CORS_ALLOWED_ORIGIN}
       allowedHeaders:
         - Content-Type
