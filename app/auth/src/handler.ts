@@ -54,8 +54,6 @@ export async function signIn(
     const body = JSON.parse(event.body);
     const response = await authService.signIn(body);
 
-    console.log("response", JSON.stringify(response));
-
     return {
       statusCode: 200,
       headers: {
