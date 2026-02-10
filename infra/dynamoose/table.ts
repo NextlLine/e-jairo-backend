@@ -16,8 +16,6 @@ const AppTableSchema = new dynamoose.Schema(
       type: String,
       rangeKey: true,
     },
-
-    // TEAM
     GSI1PK: {
       type: String,
       index: {
@@ -28,8 +26,6 @@ const AppTableSchema = new dynamoose.Schema(
     GSI1SK: {
       type: String,
     },
-
-    // UNITY
     GSI2PK: {
       type: String,
       index: {

@@ -1,0 +1,17 @@
+createAdvertisement:
+  handler: app/advertisement/src/handler.create
+  events:
+    - httpApi:
+        path: /advertisement/create
+        method: post
+        authorizer:
+          name: jwtAuthorizer
+
+listByTeam:
+  handler: app/advertisement/src/handler.listByTeam
+  events:
+    - httpApi:
+        path: /advertisement/get
+        method: get
+        authorizer:
+          name: jwtAuthorizer

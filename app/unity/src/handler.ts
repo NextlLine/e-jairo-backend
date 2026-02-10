@@ -5,7 +5,6 @@ import { UnityService } from "./service";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { dynamooseUserRepository } from "../../../infra/dynamoose/repositories/user.dynamoose.repository";
 import { HttpError } from "../../../shared/errors/http-error";
-import { th } from "zod/v4/locales";
 
 const unityService = new UnityService(dynamooseUnityRepository, dynamooseAddressRepository, dynamooseUserRepository);
 

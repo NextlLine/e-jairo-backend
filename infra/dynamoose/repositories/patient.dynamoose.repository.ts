@@ -2,7 +2,7 @@ import { Patient } from "../../../domain/patient/patient.entity";
 import { PatientRepository } from "../../../domain/patient/patient.repository";
 import { AppTable } from "../table";
 
-export class PatientDynamooseRepository implements PatientRepository {
+class PatientDynamooseRepository implements PatientRepository {
   async create(patient: Patient): Promise<Patient> {
     await AppTable.create({
       PK: `PATIENT#${patient.id}`,

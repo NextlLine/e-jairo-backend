@@ -2,7 +2,7 @@ import { User } from "../../../domain/user/user.entity";
 import { UserRepository } from "../../../domain/user/user.repository";
 import { AppTable } from "../table";
 
-export class UserDynamooseRepository implements UserRepository {
+class UserDynamooseRepository implements UserRepository {
 
   async create(user: User): Promise<User> {
     await AppTable.create({
