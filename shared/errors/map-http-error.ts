@@ -90,6 +90,6 @@ export function mapToHttpError(err: unknown, action: string): never {
     errorMap[error.name]();
   }
 
-  console.error("Unmapped Cognito error:", err);
+  console.error("Unmapped error:", err);
   throw new HttpError(500, `Erro ao realizar ${action}`);
 }

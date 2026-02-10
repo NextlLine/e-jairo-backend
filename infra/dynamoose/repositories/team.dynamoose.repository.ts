@@ -2,7 +2,7 @@ import { Team } from "../../../domain/team/team.entity";
 import { TeamRepository } from "../../../domain/team/team.repository";
 import { AppTable } from "../table";
 
-export class TeamDynamooseRepository implements TeamRepository {
+class TeamDynamooseRepository implements TeamRepository {
   async create(team: Team): Promise<Team> {
     await AppTable.create({
       PK: `TEAM#${team.id}`,

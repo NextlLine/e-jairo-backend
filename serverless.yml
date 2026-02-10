@@ -13,7 +13,7 @@ provider:
       allowedOrigins:
         - ${env:AWS_CORS_ALLOWED_ORIGIN}
         # Don't forget to comment this before commiting to main
-        # - ${env:LOCAL_CORS_ALLOWED_ORIGIN}
+        - ${env:LOCAL_CORS_ALLOWED_ORIGIN}
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -54,8 +54,10 @@ provider:
 
 functions:
   - ${file(./app/auth/functions.yml)}
+  - ${file(./app/user/functions.yml)}
   - ${file(./app/team/functions.yml)}
   - ${file(./app/unity/functions.yml)}
+  - ${file(./app/advertisement/functions.yml)}
 
 resources:
   Resources:
@@ -70,12 +72,40 @@ resources:
             AttributeType: S
           - AttributeName: SK
             AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+          - AttributeName: GSI2PK
+            AttributeType: S
+          - AttributeName: GSI2SK
+            AttributeType: S
 
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
           - AttributeName: SK
             KeyType: RANGE
+
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+          - IndexName: GSI2
+            KeySchema:
+              - AttributeName: GSI2PK
+                KeyType: HASH
+              - AttributeName: GSI2SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
 
 plugins:
   - serverless-offline

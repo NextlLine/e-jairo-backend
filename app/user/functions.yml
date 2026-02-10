@@ -1,0 +1,8 @@
+getUser:
+  handler: app/user/src/handler.get
+  events:
+    - httpApi:
+        path: /user/get
+        method: get
+        authorizer:
+          name: jwtAuthorizer

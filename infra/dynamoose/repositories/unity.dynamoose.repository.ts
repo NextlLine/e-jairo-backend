@@ -6,7 +6,7 @@ import { AppTable } from "../table";
 function normalizeName(name: string) {
   return name.trim().toLowerCase();
 }
-export class UnityDynamooseRepository implements UnityRepository {
+class UnityDynamooseRepository implements UnityRepository {
 
   async create(unity: Unity): Promise<Unity> {
     const normalized = normalizeName(unity.name);
