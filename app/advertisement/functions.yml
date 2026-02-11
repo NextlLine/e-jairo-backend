@@ -15,3 +15,12 @@ listByTeam:
         method: get
         authorizer:
           name: jwtAuthorizer
+  
+deleteAdvertisement:
+  handler: app/advertisement/src/handler.deleteById
+  events:
+    - httpApi:
+        path: /advertisement/delete/{id}
+        method: delete
+        authorizer:
+          name: jwtAuthorizer

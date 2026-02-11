@@ -9,6 +9,10 @@ const createAdvertisementSchema = z.object({
     teamId: z.string().uuid(),
 });
 
+const deleteAdvertisementSchema = z.object({
+    adId: z.string(),
+});
+
 export class AdvertisementService {
     constructor(private readonly advertisementRepository: AdvertisementRepository) { }
 
@@ -34,6 +38,23 @@ export class AdvertisementService {
         } catch (error) {
             return mapToHttpError(error, "listagem de avisos por time");
 
+        }
+    }
+
+    async delete(adData: z.infer<typeof deleteAdvertisementSchema>) {
+        const validatedAd = deleteAdvertisementSchema.parse(adData);
+            console.log(`Deleting advertisement with ID: ${validatedAd.adId}`);
+
+        try {
+            const existingAds = await this.advertisementRepository.findById(validatedAd.adId);
+
+            if (!existingAds) {
+                throw new Error("Aviso não encontrado");
+            }
+
+            await this.advertisementRepository.delete(validatedAd.adId);
+        } catch (error) {
+            return mapToHttpError(error, "deletar aviso");
         }
     }
 }

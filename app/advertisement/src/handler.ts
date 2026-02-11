@@ -71,3 +71,35 @@ export async function listByTeam(event: APIGatewayProxyEvent): Promise<APIGatewa
         return formatHttpErrorResponse(err, "Erro ao buscar anúncios por time");
     }
 }
+
+export async function deleteById(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+    try {
+        if (!event.requestContext.authorizer) {
+            throw new HttpError(401, "Não autorizado");
+        }
+
+        const userSub = event.requestContext.authorizer.jwt.claims.sub;
+
+        const user = await userService.getUserById(userSub);
+        const teamId = user?.teamId;
+
+        if (!teamId) {
+            throw new HttpError(404, "Time do usuário não encontrado");
+        }
+
+        const advertisementId = event.pathParameters?.id;
+
+        if (!advertisementId) {
+            throw new HttpError(400, "ID do anúncio não fornecido");
+        }
+
+        await advertisementService.delete({ adId: advertisementId });
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Anúncio deletado com sucesso" }),
+        };
+    } catch (err) {
+        return formatHttpErrorResponse(err, "Erro ao deletar anúncio");
+    }
+}
