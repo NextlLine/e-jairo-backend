@@ -13,7 +13,7 @@ provider:
       allowedOrigins:
         - ${env:AWS_CORS_ALLOWED_ORIGIN}
         # Don't forget to comment this before commiting to main
-        - ${env:LOCAL_CORS_ALLOWED_ORIGIN}
+        # - ${env:LOCAL_CORS_ALLOWED_ORIGIN}
       allowedHeaders:
         - Content-Type
         - Authorization
